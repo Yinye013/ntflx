@@ -8,7 +8,7 @@ type InputProps = {
   type?: string;
 };
 
-const Input: React.FC<InputProps> = ({id, onChange, value, label, type}) => {
+const Input: React.FC<InputProps> = ({ id, onChange, value, label, type }) => {
   return (
     <div>
       <div className="relative">
@@ -39,7 +39,7 @@ const Input: React.FC<InputProps> = ({id, onChange, value, label, type}) => {
       peer-focus:-translate-y-3
       "
         >
-         {label}
+          {label}
         </label>
       </div>
     </div>
