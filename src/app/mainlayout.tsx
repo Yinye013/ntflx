@@ -3,7 +3,6 @@ import React, { useEffect } from "react";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-import { SearchProvider } from "./context/SearchContext";
 import Navbar from "./(platform)/_components/Navbar";
 
 interface LayoutProps {
@@ -23,12 +22,10 @@ const MainLayout: React.FC<LayoutProps> = ({ children }) => {
     checkSession();
   }, [router]);
   return (
-    <SearchProvider>
-      <div className="container mx-auto">
-        <Navbar />
-        <main className="">{children}</main>
-      </div>
-    </SearchProvider>
+    <div>
+      <Navbar />
+      <main className="">{children}</main>
+    </div>
   );
 };
 

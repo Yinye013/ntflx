@@ -1,7 +1,14 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+* {
+  font-family: "Inter";
+}
 body {
-  @apply bg-black;
+  @apply bg-[#1c1c1c];
+}
+.misc-container {
+  @apply max-w-[1100px] mx-auto;
 }

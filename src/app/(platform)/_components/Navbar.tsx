@@ -7,6 +7,7 @@ import AccountMenu from "./AccountMenu";
 import Search from "./Search";
 import { IoChevronDownSharp } from "react-icons/io5";
 import { FaBell } from "react-icons/fa";
+import { SearchProvider } from "@/app/context/SearchContext";
 
 const Navbar = () => {
   // SHOWING MOBILE MENU
@@ -21,7 +22,7 @@ const Navbar = () => {
     setShowAccountMenu((current) => !current);
   }, []);
   return (
-    <nav className="w-full fixed z-40 backdrop-blur-sm container mx-auto">
+    <nav className=" lg:w-full fixed z-40 backdrop-blur-sm lg:container mx-auto">
       <div className="flex flex-row items-center justify-around px-4 md:px-16 py-5  transition duration-500 bg-opacity-50">
         <Logo />
         <div className="flex-row gap-7 hidden lg:flex">
@@ -43,7 +44,9 @@ const Navbar = () => {
         </div>
         <div className="flex flex-row gap-7 items-center">
           <div className="text-gray-200 hover:text-gray-300 cursor-pointer">
-            <Search />
+            <SearchProvider>
+              <Search />
+            </SearchProvider>
           </div>
           <div className="text-gray-200 hover:text-gray-300 cursor-pointer">
             <FaBell />

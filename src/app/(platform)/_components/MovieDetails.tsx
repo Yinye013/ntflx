@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import BackButton from "./BackButton";
 import Rating from "./Rating";
-// import ReactStars from "react-rating-stars-component"
+import { format, parse } from "date-fns";
 import { ClipLoader } from "react-spinners";
 
 import {
@@ -29,13 +29,17 @@ import {
   GiMusicalNotes,
   GiCrimeSceneTape,
 } from "react-icons/gi";
+import Link from "next/link";
+import { text } from "stream/consumers";
 
 type MovieDetailsProps = {
   movie: any;
   isLoading: boolean;
   error: string;
+  cast: any;
 };
 //
+
 const genreIcons: { [key: string]: JSX.Element } = {
   Drama: <GiDramaMasks size={30} />,
   War: <GiWarAxe size={30} />,
@@ -62,7 +66,12 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
   movie,
   isLoading,
   error,
+  cast,
 }) => {
+  const [isTruncated, setIsTruncated] = useState(true);
+  const toggleTruncate = () => {
+    setIsTruncated(!isTruncated);
+  };
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
@@ -74,6 +83,25 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
   if (error) {
     return <div className="text-white">Error loading movie details</div>;
   }
+
+  // RE: FORMATTING THE RELEASED DATE, AGAIN
+
+  const formatDate = (dateString: any) => {
+    // parse first
+    const date = parse(dateString, "yyyy-MM-d", new Date());
+    // format next
+    return format(date, "do MMMM, yyyy");
+  };
+  const formattedDate = formatDate(movie?.release_date);
+
+  // TRUNCATING THE TEXT
+  const truncateText = (text: string) => {
+    if (text.length <= 20) {
+      return text;
+    }
+    return text.slice(0, 100) + "...";
+  };
+  const formattedMovieOverview = truncateText(movie?.overview);
 
   return (
     <>
@@ -87,29 +115,62 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
               className="w-[60%] object-cover rounded-md"
             />
           </div>
-          <div className="">
-            <h1 className="text-white lg:text-[2.6rem] font-bold tracking-wide pt-14">
+          <div className="flex flex-col gap-5">
+            <h1 className="text-white text-2xl lg:text-[2.6rem] font-bold tracking-wide pt-14">
               {movie?.title}
             </h1>
-            <div className="flex items-center justify-between w-[70%] text-white">
+            <div className="grid lg:grid-cols-2 gap-3 lg:w-[100%] text-white">
               <p className="flex items-center gap-2">
-                Rating: <Rating voteAverage={movie?.vote_average} />{" "}
+                <strong> Rating:</strong>{" "}
+                <Rating voteAverage={movie?.vote_average} />{" "}
                 {movie?.vote_average}
               </p>{" "}
-              <p>Runtime: {movie?.runtime} mins</p>
+              <p>
+                <strong>Runtime:</strong> {movie?.runtime} mins
+              </p>
             </div>
-            <p className="text-white w-[65%] mt-8">{movie?.overview}</p>
+            <div>
+              <p className="text-white flex gap-2">
+                <strong>Released: </strong>
+                {formattedDate}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-white text-[1.4rem] font-semibold mb-2">
+                Overview
+              </h3>{" "}
+              <p className="text-white w-[65%]">
+                {isTruncated ? formattedMovieOverview : movie?.overview}
+                <span
+                  className="text-white text-[13px] cursor-pointer transition duration-200  hover:underline"
+                  onClick={toggleTruncate}
+                >
+                  {isTruncated ? "view more" : "view less"}
+                </span>
+              </p>
+            </div>
 
             <div>
-              {movie?.genres.map((genre: any) => (
-                <ul className="flex flex-row items-center gap-2 text-white">
+              <ul className="flex flex-col lg:flex-row lg:items-center gap-2 text-white">
+                <strong className="text-white">Genre:</strong>
+                {movie?.genres.map((genre: any) => (
                   <li key={genre.id} className="flex items-center  gap-2">
                     {genreIcons[genre.name] || <FaTheaterMasks />}
                     {genre.name}
                   </li>
-                </ul>
-              ))}
+                ))}
+              </ul>
             </div>
+            <p className="text-white">
+              Cast: {cast?.cast[0].name}, {cast?.cast[1].name},{" "}
+              {cast?.cast[2].name}...{" "}
+              <Link
+                href={`/cast/${movie?.id}`}
+                className="text-[13px] cursor-pointer transition duration-200"
+              >
+                view more
+              </Link>
+            </p>
           </div>
         </div>
       </div>

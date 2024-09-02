@@ -1,13 +1,11 @@
-import React from "react";
 import useSWR from "swr";
 import axios from "axios";
 
 const fetcher = async (url: string) => {
   try {
-    console.log(`Fetching data from: ${url}`);
+    console.log(`Fetching data from ${url}`);
     const response = await axios.get(url);
     console.log("Response data:", response.data);
-
     return response.data;
   } catch (error: any) {
     throw new Error(`Failed to fetch data from ${url}: ${error.message}`);
@@ -33,23 +31,11 @@ interface Movie {
   // Add any other fields you expect in your movie object
 }
 
-interface PropsMovie {
-  movieId: any;
-}
-
-// interface UseGetMovies {
-//   data: Movie | undefined;
-//   error: Error | undefined;a
-//   isLoading: boolean;
-//   isValidating: boolean;
-//   mutate: () => void;
-// }
-
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMBD_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
-const useGetMovies = ({ movieId }: PropsMovie) => {
-  if (!movieId) {
+const useSearchMovies = (query: any) => {
+  if (!query) {
     return {
       data: undefined,
       error: undefined,
@@ -58,9 +44,10 @@ const useGetMovies = ({ movieId }: PropsMovie) => {
       mutate: () => {},
     };
   }
-
-  const { data, error, isValidating, mutate } = useSWR<Movie>(
-    movieId ? `${TMBD_API_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}` : null,
+  const { data, error } = useSWR<Movie>(
+    query
+      ? `${TMBD_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${query}`
+      : null,
     fetcher
   );
   const isLoading = !data && !error;
@@ -69,9 +56,7 @@ const useGetMovies = ({ movieId }: PropsMovie) => {
     data,
     error,
     isLoading,
-    isValidating,
-    mutate,
   };
 };
 
-export default useGetMovies;
+export default useSearchMovies;

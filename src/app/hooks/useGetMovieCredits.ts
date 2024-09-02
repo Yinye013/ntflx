@@ -14,22 +14,20 @@ const fetcher = async (url: string) => {
   }
 };
 
-interface Genre {
+interface CastMember {
+  adult: boolean;
+  gender: number;
   id: number;
+  cast: any;
+  known_for_department: string;
   name: string;
-}
-
-interface Movie {
-  id: string;
-  original_title: string;
-  title: string;
-  overview: string;
-  runtime: number;
-  genres: Genre[];
-  vote_average: number;
-  poster_path: string;
-  backdrop_path: string;
-  release_date: string;
+  original_name: string;
+  popularity: number;
+  profile_path: string;
+  cast_id: number;
+  character: string;
+  credit_id: string;
+  order: number;
   // Add any other fields you expect in your movie object
 }
 
@@ -48,7 +46,7 @@ interface PropsMovie {
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMBD_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
-const useGetMovies = ({ movieId }: PropsMovie) => {
+const useGetMovieCredits = ({ movieId }: PropsMovie) => {
   if (!movieId) {
     return {
       data: undefined,
@@ -59,8 +57,10 @@ const useGetMovies = ({ movieId }: PropsMovie) => {
     };
   }
 
-  const { data, error, isValidating, mutate } = useSWR<Movie>(
-    movieId ? `${TMBD_API_URL}/movie/${movieId}?api_key=${TMDB_API_KEY}` : null,
+  const { data, error, isValidating, mutate } = useSWR<CastMember>(
+    movieId
+      ? `${TMBD_API_URL}/movie/${movieId}/credits?api_key=${TMDB_API_KEY}`
+      : null,
     fetcher
   );
   const isLoading = !data && !error;
@@ -74,4 +74,4 @@ const useGetMovies = ({ movieId }: PropsMovie) => {
   };
 };
 
-export default useGetMovies;
+export default useGetMovieCredits;

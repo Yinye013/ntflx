@@ -38,15 +38,17 @@ const MovieBanner = () => {
         ></iframe>
       )}
 
-      <div className="absolute top-[40%] pl-[8rem] w-[85%]">
-        <p className="text-white tracking-wide lg:text-5xl font-bold w-[55%] h-full">
+      <div className="absolute top-[65%] pl-[4rem] lg:top-[40%] lg:pl-[8rem] w-[85%]">
+        <h1 className="text-white tracking-wide text-3xl w-full lg:text-5xl font-bold h-full">
           {movie?.title}
+        </h1>
+        <p className="text-white w-full mt-5 lg:w-[60%] lg:mt-8">
+          {movie?.overview}
         </p>
-        <p className="text-white w-[60%] mt-8">{movie?.overview}</p>
         <Link
           href={`/details/${movie?.id}`}
           onClick={handleLoading}
-          className="text-white w-[16%] mt-7 flex items-center justify-center gap-2 px-5 py-2 bg-slate-600 opacity-40 rounded-md backdrop-blur-md"
+          className="text-white mt-5 lg:w-[16%] lg:mt-7 flex items-center justify-center gap-2 px-5 py-2 bg-slate-600 opacity-40 rounded-md backdrop-blur-md"
         >
           {linkLoading ? (
             <ClipLoader size={20} color={"#fff"} loading={true} />

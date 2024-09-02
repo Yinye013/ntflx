@@ -5,7 +5,7 @@ import MainLayout from "../mainlayout";
 const page = () => {
   return (
     <MainLayout>
-      <div className="pt-[130px]">
+      <div className="pt-[130px] misc-container">
         <h1 className="py-10 text-white"> Trending Movies!</h1>
       </div>
     </MainLayout>

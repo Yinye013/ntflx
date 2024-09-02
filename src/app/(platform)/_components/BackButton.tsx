@@ -13,7 +13,7 @@ const BackButton = () => {
     <Link
       href="/"
       onClick={handleLoading}
-      className="bg-white w-[12%] ml-8 px-4 py-2 flex items-center justify-center gap-3 rounded-md mb-10  lg:px-6 lg:py-3"
+      className="bg-white lg:w-[12%] flex items-center justify-center gap-3 rounded-md mb-10  lg:px-6 lg:py-3"
     >
       {linkLoading ? (
         <ClipLoader size={20} color="#000" />

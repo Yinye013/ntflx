@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 
 import MainLayout from "@/app/mainlayout";
 import useGetMovies from "@/app/hooks/useGetMovies";
+import useGetMovieCredits from "@/app/hooks/useGetMovieCredits";
 
 const page = () => {
   const { id } = useParams(); // Extracts the 'id' parameter from the URL
@@ -16,12 +17,18 @@ const page = () => {
 
   const movieProps = { movieId: id }; // Creates an object with 'movieId' to pass to the custom hook.
   const { data, error, isLoading } = useGetMovies(movieProps); // Uses the custom hook to fetch movie data.
+  const { data: cast } = useGetMovieCredits(movieProps);
   //   MOST LIKELY THE SOLUTION TO THIS ERROR LMAO
   // CAN'T SEEM TO FIGURE OUT WHAT IT IS BUT IT IS MOST LIKELY THIS!!
 
   return (
     <MainLayout>
-      <MovieDetails movie={data} isLoading={isLoading} error={error} />
+      <MovieDetails
+        movie={data}
+        isLoading={isLoading}
+        error={error}
+        cast={cast}
+      />
     </MainLayout>
   );
 };
