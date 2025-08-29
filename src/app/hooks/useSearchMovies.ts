@@ -39,31 +39,23 @@ interface SearchResponse {
 }
 
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-const TMBD_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
+const TMDB_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
 const useSearchMovies = (query: string) => {
-  if (!query || query.trim() === '') {
-    return {
-      data: undefined,
-      error: undefined,
-      isLoading: false,
-      isValidating: false,
-      mutate: () => {},
-    };
-  }
+  const shouldFetch = query && query.trim() !== '';
   
   const { data, error, isLoading, isValidating, mutate } = useSWR<SearchResponse>(
-    query
-      ? `${TMBD_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
+    shouldFetch
+      ? `${TMDB_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
       : null,
     fetcher
   );
 
   return {
-    data,
-    error,
-    isLoading,
-    isValidating,
+    data: shouldFetch ? data : undefined,
+    error: shouldFetch ? error : undefined,
+    isLoading: shouldFetch ? isLoading : false,
+    isValidating: shouldFetch ? isValidating : false,
     mutate,
   };
 };

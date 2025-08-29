@@ -3,13 +3,24 @@ import React, { useState, useEffect, useRef } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import { useSearch } from "@/app/context/SearchContext";
 import { usePathname, useRouter } from "next/navigation";
+import useSearchMovies from "@/app/hooks/useSearchMovies";
 
 const Search: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const { query, setQuery } = useSearch();
+  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const { 
+    query, 
+    setQuery, 
+    setSearchResults, 
+    setIsLoading, 
+    setError 
+  } = useSearch();
   const router = useRouter();
   const pathname = usePathname();
   const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Trigger search API calls as user types
+  const { data, error, isLoading } = useSearchMovies(debouncedQuery);
 
   const handleSearchClick = () => {
     setIsExpanded(true);
@@ -29,15 +40,31 @@ const Search: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
-      router.push("/search");
+      router.push(`/search?q=${encodeURIComponent(query)}`);
     }
   };
+
+  // Debounce the search query
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(query);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [query]);
 
   useEffect(() => {
     if (pathname === "/search") {
       setIsExpanded(true);
     }
   }, [pathname]);
+
+  // Update context with search results
+  useEffect(() => {
+    setSearchResults(data);
+    setIsLoading(isLoading);
+    setError(error);
+  }, [data, error, isLoading, setSearchResults, setIsLoading, setError]);
 
   const handleBlur = () => {
     // Only close if query is empty and we're not on search page

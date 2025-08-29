@@ -17,7 +17,7 @@ interface Video {
   type?: string;
 }
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
-const TMBD_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
+const TMDB_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
 const useRandomMovies = () => {
   const [movie, setMovie] = useState<Movie | null>(null);
@@ -30,9 +30,9 @@ const useRandomMovies = () => {
     const fetchRandomMovie = async () => {
       try {
         setLoading(true);
-        console.log("TMDB API Config:", { TMDB_API_KEY: !!TMDB_API_KEY, TMBD_API_URL });
+        console.log("TMDB API Config:", { TMDB_API_KEY: !!TMDB_API_KEY, TMDB_API_URL });
 
-        if (!TMDB_API_KEY || !TMBD_API_URL) {
+        if (!TMDB_API_KEY || !TMDB_API_URL) {
           setError("TMDB API configuration missing");
           return;
         }
@@ -40,7 +40,7 @@ const useRandomMovies = () => {
         const {
           data: { total_pages },
         } = await axios.get(
-          `${TMBD_API_URL}/movie/popular?api_key=${TMDB_API_KEY}`
+          `${TMDB_API_URL}/movie/popular?api_key=${TMDB_API_KEY}`
         );
         console.log("Total pages:", total_pages);
         
@@ -48,7 +48,7 @@ const useRandomMovies = () => {
         console.log("Random page:", randomPage);
 
         const moviesResponse = await axios.get(
-          `${TMBD_API_URL}/movie/popular?api_key=${TMDB_API_KEY}&page=${randomPage}`
+          `${TMDB_API_URL}/movie/popular?api_key=${TMDB_API_KEY}&page=${randomPage}`
         );
         const movies = moviesResponse.data.results;
         console.log("Movies found:", movies.length);
@@ -58,7 +58,7 @@ const useRandomMovies = () => {
         console.log("Selected movie:", randomMovie.title, randomMovie.id);
         
         const response = await axios.get(
-          `${TMBD_API_URL}/movie/${randomMovie.id}/videos?api_key=${TMDB_API_KEY}`
+          `${TMDB_API_URL}/movie/${randomMovie.id}/videos?api_key=${TMDB_API_KEY}`
         );
         const videoData = response.data;
         console.log("Video data:", videoData);

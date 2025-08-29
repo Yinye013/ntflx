@@ -1,22 +1,53 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import MainLayout from "../mainlayout";
 import { useSearch } from "../context/SearchContext";
 import useSearchMovies from "../hooks/useSearchMovies";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 const SearchPage: React.FC = () => {
-  const { query } = useSearch();
-  const { data, error, isLoading } = useSearchMovies(query);
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get("q") || "";
+  const {
+    query,
+    setQuery,
+    searchResults: contextData,
+    error: contextError,
+    isLoading: contextLoading,
+  } = useSearch();
+
+  // Set query from URL if it exists and context query is empty
+  useEffect(() => {
+    if (urlQuery && !query) {
+      setQuery(urlQuery);
+    }
+  }, [urlQuery, query, setQuery]);
+
+  // Use URL query if context query is empty
+  const activeQuery = query || urlQuery;
+
+  // Fallback: also trigger search on this page in case context data is missing
+  const {
+    data: hookData,
+    error: hookError,
+    isLoading: hookLoading,
+  } = useSearchMovies(activeQuery);
+
+  // Use context data if available, otherwise use hook data
+  const data = contextData || hookData;
+  const error = contextError || hookError;
+  const isLoading = contextLoading || hookLoading;
 
   return (
     <MainLayout>
       <div className="pt-[130px] px-4 md:px-8 lg:px-16">
         {/* Search Header */}
         <div className="mb-8">
-          {query ? (
+          {activeQuery ? (
             <h1 className="text-2xl md:text-3xl text-white font-semibold">
-              Search results for "{query}"
+              Search results for "{activeQuery}"
             </h1>
           ) : (
             <h1 className="text-2xl md:text-3xl text-white font-semibold">
@@ -47,11 +78,12 @@ const SearchPage: React.FC = () => {
             <div className="text-gray-300 text-sm">
               Found {data.total_results} results
             </div>
-            
+
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {data.results.map((movie) => (
-                <div
+                <Link
                   key={movie.id}
+                  href={`/details/${movie.id}`}
                   className="group cursor-pointer transition-transform duration-300 hover:scale-105"
                 >
                   <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800">
@@ -66,14 +98,14 @@ const SearchPage: React.FC = () => {
                         No Image
                       </div>
                     )}
-                    
+
                     {/* Overlay with movie info */}
                     <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100">
                       <div className="text-white text-sm font-medium mb-1 truncate">
                         {movie.title}
                       </div>
                       <div className="text-gray-300 text-xs">
-                        {movie.release_date?.split('-')[0]}
+                        {movie.release_date?.split("-")[0]}
                       </div>
                       <div className="flex items-center mt-1">
                         <span className="text-yellow-400 text-xs">★</span>
@@ -83,7 +115,7 @@ const SearchPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

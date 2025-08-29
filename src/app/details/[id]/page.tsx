@@ -2,6 +2,7 @@
 
 import React from "react";
 import MovieDetails from "../../(platform)/_components/MovieDetails";
+import MovieDetailBanner from "../../(platform)/_components/MovieDetailBanner";
 import { useParams } from "next/navigation";
 
 import MainLayout from "@/app/mainlayout";
@@ -18,17 +19,32 @@ const page = () => {
   const movieProps = { movieId: id }; // Creates an object with 'movieId' to pass to the custom hook.
   const { data, error, isLoading } = useGetMovies(movieProps); // Uses the custom hook to fetch movie data.
   const { data: cast } = useGetMovieCredits(movieProps);
-  //   MOST LIKELY THE SOLUTION TO THIS ERROR LMAO
-  // CAN'T SEEM TO FIGURE OUT WHAT IT IS BUT IT IS MOST LIKELY THIS!!
+
+  const scrollToDetails = () => {
+    const detailsElement = document.getElementById('movie-details');
+    if (detailsElement) {
+      detailsElement.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <MainLayout>
-      <MovieDetails
+      {/* Movie Banner */}
+      <MovieDetailBanner
         movie={data}
         isLoading={isLoading}
-        error={error}
-        cast={cast}
+        onViewDetails={scrollToDetails}
       />
+      
+      {/* Movie Details Section */}
+      <div id="movie-details">
+        <MovieDetails
+          movie={data}
+          isLoading={isLoading}
+          error={error}
+          cast={cast}
+        />
+      </div>
     </MainLayout>
   );
 };

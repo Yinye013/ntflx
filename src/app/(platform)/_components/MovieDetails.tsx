@@ -162,8 +162,8 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
               </ul>
             </div>
             <p className="text-white">
-              Cast: {cast?.cast[0].name}, {cast?.cast[1].name},{" "}
-              {cast?.cast[2].name}...{" "}
+              Cast: {cast?.cast[0]?.name}, {cast?.cast[1]?.name},{" "}
+              {cast?.cast[2]?.name}...{" "}
               <Link
                 href={`/cast/${movie?.id}`}
                 className="text-[13px] cursor-pointer transition duration-200"
