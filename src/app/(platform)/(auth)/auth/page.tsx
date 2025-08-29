@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Input from "../../_components/Input";
 import Logo from "../../_components/Logo";
@@ -11,7 +11,7 @@ import { FaGithub, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Button } from "../../../../components/ui/button";
 import { ClipLoader } from "react-spinners";
 
-function page() {
+function AuthPageContent() {
   const [email, setEmail] = useState("");
   const [name, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -20,15 +20,15 @@ function page() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
-  
-  const searchParams = useSearchParams();
-  const error = searchParams?.get('error');
 
-  useEffect(() => {
-    if (error) {
-      console.error('OAuth Error:', error);
-    }
-  }, [error]);
+  const searchParams = useSearchParams();
+  const error = searchParams?.get("error");
+
+  // useEffect(() => {
+  //   if (error) {
+  //     console.error("OAuth Error:", error);
+  //   }
+  // }, [error]);
 
   //using usecallback to create a toggler
   const toggleToggler = useCallback(() => {
@@ -82,26 +82,32 @@ function page() {
   }, [email, name, password, login]);
 
   // FORM SUBMIT HANDLER
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", { toggler, email, password, name });
-    
-    if (toggler === "login") {
-      await login();
-    } else {
-      await register();
-    }
-  }, [toggler, login, register, email, password, name]);
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      console.log("Form submitted:", { toggler, email, password, name });
+
+      if (toggler === "login") {
+        await login();
+      } else {
+        await register();
+      }
+    },
+    [toggler, login, register, email, password, name]
+  );
 
   //SIGNIN WITH GOOGLE
-  const signInWithGoogle = useCallback(() => {
+  const signInWithGoogle = useCallback(async () => {
     setIsGoogleLoading(true);
-    console.log("=== CLIENT: Initiating Google sign-in ===");
-    console.log("Current URL:", window.location.href);
-    console.log("Target URL:", `/api/auth/signin/google?callbackUrl=${encodeURIComponent('/profiles')}`);
-    
-    // Use direct URL approach - let NextAuth handle the full redirect flow
-    window.location.href = `/api/auth/signin/google?callbackUrl=${encodeURIComponent('/profiles')}`;
+    try {
+      await signIn("google", {
+        callbackUrl: "/profiles",
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsGoogleLoading(false);
+    }
   }, []);
 
   //SIGNIN WITH GITHUB
@@ -130,7 +136,7 @@ function page() {
             <h2 className="text-white font-semibold text-3xl mb-8">
               {toggler === "login" ? "Sign In" : "Register"}
             </h2>
-            
+
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {toggler === "register" && (
                 <Input
@@ -257,6 +263,14 @@ function page() {
         </div>
       </div>
     </div>
+  );
+}
+
+function page() {
+  return (
+    <Suspense fallback={<div className="flex justify-center h-screen items-center bg-black"><div className="text-white text-xl">Loading...</div></div>}>
+      <AuthPageContent />
+    </Suspense>
   );
 }
 
