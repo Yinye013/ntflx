@@ -12,7 +12,7 @@ generator client {
 
 datasource db {
   provider = "mongodb"
-  url      = "mongodb+srv://onyinye:BsqEd*VN-dA$x7M@cluster0.bao8bjr.mongodb.net/test"
+  url      = env("DATABASE_URL")
 }
 
 // first model using objectid

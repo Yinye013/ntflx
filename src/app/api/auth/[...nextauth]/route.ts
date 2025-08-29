@@ -11,6 +11,22 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 const prisma = new PrismaClient();
 
+// Debug environment variables
+console.log("Environment variables check:");
+console.log(
+  "GOOGLE_CLIENT_ID:",
+  process.env.GOOGLE_CLIENT_ID ? "✓ Set" : "✗ Missing"
+);
+console.log(
+  "GOOGLE_CLIENT_SECRET:",
+  process.env.GOOGLE_CLIENT_SECRET ? "✓ Set" : "✗ Missing"
+);
+console.log(
+  "NEXTAUTH_SECRET:",
+  process.env.NEXTAUTH_SECRET ? "✓ Set" : "✗ Missing"
+);
+console.log("NEXTAUTH_URL:", process.env.NEXTAUTH_URL);
+
 const handler = NextAuth({
   providers: [
     GithubProvider({
@@ -67,8 +83,34 @@ const handler = NextAuth({
   pages: {
     signIn: "/auth",
   },
+  callbacks: {
+    async redirect({ url, baseUrl }) {
+      console.log("NextAuth redirect callback:", { url, baseUrl });
+      return `${baseUrl}/profiles`;
+    },
+    async signIn({ user, account, profile }) {
+      console.log("=== NextAuth SignIn Callback ===");
+      console.log("Provider:", account?.provider);
+      console.log("Account full object:", JSON.stringify(account, null, 2));
+      console.log("User full object:", JSON.stringify(user, null, 2));
+      console.log("Profile full object:", JSON.stringify(profile, null, 2));
+
+      if (account?.error) {
+        console.error("OAUTH ERROR DETECTED:", account.error);
+        console.error("Error details:", account);
+        return false;
+      }
+
+      return true; // Allow all sign-ins for now
+    },
+  },
+  events: {
+    async signIn(message) {
+      console.log("NextAuth signIn event:", message);
+    },
+  },
   debug: process.env.NODE_ENV === "development",
-  adapter: PrismaAdapter(prisma),
+  // adapter: PrismaAdapter(prisma), // Temporarily disabled
   session: {
     strategy: "jwt",
   },

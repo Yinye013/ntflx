@@ -4,12 +4,12 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getSession } from "next-auth/react";
 import useCurrentUser from "../hooks/useCurrentUser";
+import Image from "next/image";
 
 function Profiles() {
-  const { data } = useCurrentUser();
-
-  //CHECK IF THERE IS A SESSION AND IF THERE IS NO SESSION, PUSH TO AUTH PAGE
+  const { data, isLoading } = useCurrentUser();
   const router = useRouter();
+
   useEffect(() => {
     const checkSession = async () => {
       const session = await getSession();
@@ -20,24 +20,36 @@ function Profiles() {
 
     checkSession();
   }, [router]);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center h-screen items-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex justify-center h-screen items-center ">
+    <div className="flex justify-center h-screen items-center bg-black">
       <div className="flex flex-col">
-        <h1 className="text-white text-3xl md:text-6xl ">Who's logged in?</h1>
+        <h1 className="text-white text-3xl md:text-6xl text-center">Who's watching?</h1>
 
         <div className="flex items-center justify-center gap-8 mt-10">
           <div
-            onClick={() => {
-              router.push("/");
-            }}
+            onClick={() => router.push("/")}
+            className="group flex flex-col items-center cursor-pointer"
           >
-            <div className="group flex-row w-44 mx-auto">
-              <div className="w-44 h-44 rounded-md flex items-center justify-center border-2 border-transparent  transition group-hover:cursor-pointer group-hover:border-white overflow-hidden ">
-                <img src="/images/profileblue.png" alt="avatar" />
-              </div>
-              <div className="mt-4 text-gray-400 text-2xl text-center transition group-hover:text-white">
-                {data?.name}
-              </div>
+            <div className="w-44 h-44 rounded-md flex items-center justify-center border-2 border-transparent transition group-hover:border-white overflow-hidden bg-gray-800">
+              <Image
+                src="/images/profileblue.png"
+                alt="Profile Avatar"
+                width={176}
+                height={176}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div className="mt-4 text-gray-400 text-2xl text-center transition group-hover:text-white">
+              {data?.name || "User"}
             </div>
           </div>
         </div>

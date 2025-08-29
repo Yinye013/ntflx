@@ -12,14 +12,14 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
     const { email, name, password } = payload;
 
-    const existingUser = prisma.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: {
         email,
       },
     });
-    if (!existingUser) {
+    if (existingUser) {
       return NextResponse.json({
-        error: "Email taken"!,
+        error: "Email taken!",
         status: 422,
       });
     }

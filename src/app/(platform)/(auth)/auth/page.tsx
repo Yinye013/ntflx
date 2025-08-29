@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Input from "../../_components/Input";
 import Logo from "../../_components/Logo";
 import axios from "axios";
@@ -19,6 +20,15 @@ function page() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
+  
+  const searchParams = useSearchParams();
+  const error = searchParams?.get('error');
+
+  useEffect(() => {
+    if (error) {
+      console.error('OAuth Error:', error);
+    }
+  }, [error]);
 
   //using usecallback to create a toggler
   const toggleToggler = useCallback(() => {
@@ -26,7 +36,9 @@ function page() {
   }, []);
 
   // creating a callback function to toggle password visibility
-  const togglePasswordVisibility = useCallback(() => {
+  const togglePasswordVisibility = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsPasswordVisible((current) => !current);
   }, []);
 
@@ -69,18 +81,27 @@ function page() {
     }
   }, [email, name, password, login]);
 
-  //SIGNIN WITH GOOGLE
-  const signInWithGoogle = useCallback(async () => {
-    setIsGoogleLoading(true);
-    try {
-      await signIn("google", {
-        callbackUrl: "/profiles",
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsGoogleLoading(false);
+  // FORM SUBMIT HANDLER
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Form submitted:", { toggler, email, password, name });
+    
+    if (toggler === "login") {
+      await login();
+    } else {
+      await register();
     }
+  }, [toggler, login, register, email, password, name]);
+
+  //SIGNIN WITH GOOGLE
+  const signInWithGoogle = useCallback(() => {
+    setIsGoogleLoading(true);
+    console.log("=== CLIENT: Initiating Google sign-in ===");
+    console.log("Current URL:", window.location.href);
+    console.log("Target URL:", `/api/auth/signin/google?callbackUrl=${encodeURIComponent('/profiles')}`);
+    
+    // Use direct URL approach - let NextAuth handle the full redirect flow
+    window.location.href = `/api/auth/signin/google?callbackUrl=${encodeURIComponent('/profiles')}`;
   }, []);
 
   //SIGNIN WITH GITHUB
@@ -109,7 +130,8 @@ function page() {
             <h2 className="text-white font-semibold text-3xl mb-8">
               {toggler === "login" ? "Sign In" : "Register"}
             </h2>
-            <div className="flex flex-col gap-4">
+            
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               {toggler === "register" && (
                 <Input
                   label="Username"
@@ -117,7 +139,7 @@ function page() {
                     setUsername(e.target.value);
                   }}
                   id="name"
-                  type="name"
+                  type="text"
                   value={name}
                 />
               )}
@@ -132,74 +154,53 @@ function page() {
                 value={email}
               />
 
-              <div
-                className="relative flex items-center w-full
-      block
-      rounded-md
-      px-6
-      pt-6
-      text-md
-      text-white
-      bg-neutral-700
-      appearance-none
-      focus:outline-none
-      focus:ring-0 peer"
-              >
-                <input
-                  onChange={(e: any) => {
-                    setPassword(e.target.value);
-                  }}
-                  id="password"
-                  type={isPasswordVisible ? "text" : "password"}
-                  value={password}
-                  className="
-                  relative w-full
-      block
-      text-md
-      text-white
-      bg-neutral-700
-      appearance-none
-      focus:outline-none
-      focus:ring-0 peer
-      "
-                  placeholder=" "
-                />
-                <span
-                  onClick={togglePasswordVisibility}
-                  style={{ cursor: "pointer" }}
-                >
-                  {!isPasswordVisible ? (
-                    <FaEyeSlash className="text-white" />
-                  ) : (
-                    <FaEye className="text-white" />
-                  )}
-                </span>
-                <label
-                  htmlFor={"password"}
-                  className="
-      absolute text-md text-zinc-300 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-6 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0
-      peer-focus:scale-75
-      peer-focus:-translate-y-3
-      "
-                >
-                  Password
-                </label>
+              <div className="relative w-full">
+                <div className="relative flex items-center rounded-md px-6 pt-6 text-md text-white bg-neutral-700 focus-within:outline-none focus-within:ring-0">
+                  <input
+                    onChange={(e: any) => {
+                      setPassword(e.target.value);
+                    }}
+                    id="password"
+                    type={isPasswordVisible ? "text" : "password"}
+                    value={password}
+                    required
+                    className="w-full bg-neutral-700 text-white focus:outline-none focus:ring-0 peer"
+                    placeholder=" "
+                  />
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="absolute right-6 cursor-pointer z-20 p-1"
+                  >
+                    {!isPasswordVisible ? (
+                      <FaEyeSlash className="text-white" />
+                    ) : (
+                      <FaEye className="text-white" />
+                    )}
+                  </button>
+                  <label
+                    htmlFor="password"
+                    className="absolute text-md text-zinc-300 duration-150 transform -translate-y-3 scale-75 top-4 z-10 origin-[0] left-6 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3"
+                  >
+                    Password
+                  </label>
+                </div>
               </div>
-            </div>
 
-            <Button
-              variant={"login_signup"}
-              onClick={toggler === "login" ? login : register}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <ClipLoader color="#fff" size={20} />
-              ) : toggler === "login" ? (
-                "Login"
-              ) : (
-                "Sign Up"
-              )}
-            </Button>
+              <Button
+                type="submit"
+                variant={"login_signup"}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <ClipLoader color="#fff" size={20} />
+                ) : toggler === "login" ? (
+                  "Login"
+                ) : (
+                  "Sign Up"
+                )}
+              </Button>
+            </form>
 
             {/* GITHUB AND GOOGLE BUTTONS */}
             <div className="flex items-center gap-4 mt-8 justify-center items-center">
