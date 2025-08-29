@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, Suspense } from "react";
 import MainLayout from "../mainlayout";
 import { useSearch } from "../context/SearchContext";
 import useSearchMovies from "../hooks/useSearchMovies";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-const SearchPage: React.FC = () => {
+const SearchPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get("q") || "";
   const {
@@ -140,6 +140,22 @@ const SearchPage: React.FC = () => {
         )}
       </div>
     </MainLayout>
+  );
+};
+
+const SearchPage: React.FC = () => {
+  return (
+    <Suspense fallback={
+      <MainLayout>
+        <div className="pt-[130px] px-4 md:px-8 lg:px-16">
+          <div className="flex items-center justify-center py-20">
+            <div className="text-white text-lg">Loading search...</div>
+          </div>
+        </div>
+      </MainLayout>
+    }>
+      <SearchPageContent />
+    </Suspense>
   );
 };
 
