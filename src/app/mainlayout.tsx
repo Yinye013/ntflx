@@ -4,6 +4,7 @@ import { getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 import Navbar from "./(platform)/_components/Navbar";
+import { SearchProvider } from "./context/SearchContext";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -22,10 +23,12 @@ const MainLayout: React.FC<LayoutProps> = ({ children }) => {
     checkSession();
   }, [router]);
   return (
-    <div>
-      <Navbar />
-      <main className="">{children}</main>
-    </div>
+    <SearchProvider>
+      <div>
+        <Navbar />
+        <main className="">{children}</main>
+      </div>
+    </SearchProvider>
   );
 };
 

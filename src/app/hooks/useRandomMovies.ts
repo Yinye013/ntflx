@@ -14,6 +14,7 @@ interface Movie {
 interface Video {
   key: string;
   site: string;
+  type?: string;
 }
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMBD_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
@@ -29,35 +30,53 @@ const useRandomMovies = () => {
     const fetchRandomMovie = async () => {
       try {
         setLoading(true);
+        console.log("TMDB API Config:", { TMDB_API_KEY: !!TMDB_API_KEY, TMBD_API_URL });
+
+        if (!TMDB_API_KEY || !TMBD_API_URL) {
+          setError("TMDB API configuration missing");
+          return;
+        }
 
         const {
           data: { total_pages },
         } = await axios.get(
           `${TMBD_API_URL}/movie/popular?api_key=${TMDB_API_KEY}`
         );
-        const randomPage = (Math.floor(Math.random() * total_pages) + 1) / 1000;
+        console.log("Total pages:", total_pages);
+        
+        const randomPage = Math.floor(Math.random() * Math.min(total_pages, 500)) + 1;
+        console.log("Random page:", randomPage);
 
         const moviesResponse = await axios.get(
           `${TMBD_API_URL}/movie/popular?api_key=${TMDB_API_KEY}&page=${randomPage}`
         );
         const movies = moviesResponse.data.results;
-        console.log(movies.length);
+        console.log("Movies found:", movies.length);
+        
         const randomMovie = movies[Math.floor(Math.random() * movies.length)];
         setMovie(randomMovie);
-        // setMovieId(randomMovie.id);
-        console.log(randomMovie.id);
+        console.log("Selected movie:", randomMovie.title, randomMovie.id);
+        
         const response = await axios.get(
           `${TMBD_API_URL}/movie/${randomMovie.id}/videos?api_key=${TMDB_API_KEY}`
         );
         const videoData = response.data;
-        console.log(videoData);
+        console.log("Video data:", videoData);
+        
         const youtubeVideo = videoData.results.find(
-          (v: Video) => v.site === "YouTube"
+          (v: Video) => v.site === "YouTube" && (v.type === "Trailer" || v.type === "Teaser")
         );
-        setVideo(youtubeVideo || null);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Failed to fetch movie data.");
+        
+        if (youtubeVideo) {
+          console.log("YouTube video found:", youtubeVideo);
+          setVideo(youtubeVideo);
+        } else {
+          console.log("No YouTube trailer found, using backdrop image");
+          setVideo(null);
+        }
+      } catch (error: any) {
+        console.error("Error fetching movie data:", error);
+        setError(`Failed to fetch movie data: ${error.message}`);
       } finally {
         setLoading(false);
       }

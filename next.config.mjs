@@ -14,7 +14,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https:",
               "connect-src 'self' https://api.themoviedb.org https://accounts.google.com https://github.com",
-              "frame-src https://accounts.google.com",
+              "frame-src https://accounts.google.com https://www.youtube.com",
             ].join('; '),
           },
         ],

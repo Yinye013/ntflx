@@ -18,12 +18,12 @@ interface Genre {
 }
 
 interface Movie {
-  id: string;
+  id: number;
   original_title: string;
   title: string;
   overview: string;
-  runtime: number;
-  genres: Genre[];
+  runtime?: number;
+  genres?: Genre[];
   vote_average: number;
   poster_path: string;
   backdrop_path: string;
@@ -31,11 +31,18 @@ interface Movie {
   // Add any other fields you expect in your movie object
 }
 
+interface SearchResponse {
+  page: number;
+  results: Movie[];
+  total_pages: number;
+  total_results: number;
+}
+
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMBD_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
-const useSearchMovies = (query: any) => {
-  if (!query) {
+const useSearchMovies = (query: string) => {
+  if (!query || query.trim() === '') {
     return {
       data: undefined,
       error: undefined,
@@ -44,18 +51,20 @@ const useSearchMovies = (query: any) => {
       mutate: () => {},
     };
   }
-  const { data, error } = useSWR<Movie>(
+  
+  const { data, error, isLoading, isValidating, mutate } = useSWR<SearchResponse>(
     query
-      ? `${TMBD_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${query}`
+      ? `${TMBD_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
       : null,
     fetcher
   );
-  const isLoading = !data && !error;
 
   return {
     data,
     error,
     isLoading,
+    isValidating,
+    mutate,
   };
 };
 
