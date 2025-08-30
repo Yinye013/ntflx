@@ -9,14 +9,14 @@ interface MovieDetailBannerProps {
   onViewDetails?: () => void;
 }
 
-const MovieDetailBanner: React.FC<MovieDetailBannerProps> = ({ 
-  movie, 
-  isLoading, 
-  onViewDetails 
+const MovieDetailBanner: React.FC<MovieDetailBannerProps> = ({
+  movie,
+  isLoading,
+  onViewDetails,
 }) => {
   const [isMuted, setIsMuted] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  
+
   // Fetch movie videos/trailer
   const { trailer, isLoading: videosLoading } = useMovieVideos(movie?.id);
 
@@ -83,31 +83,37 @@ const MovieDetailBanner: React.FC<MovieDetailBannerProps> = ({
       {trailer && !videosLoading && (
         <button
           onClick={toggleMute}
-          className="absolute top-40 right-8 z-10 bg-black bg-opacity-60 hover:bg-opacity-80 transition-all duration-200 rounded-full p-3 text-white"
+          className="absolute top-20 right-4 sm:top-24 sm:right-6 md:top-32 md:right-8 lg:top-40 lg:right-8 z-10 bg-black bg-opacity-60 hover:bg-opacity-80 transition-all duration-200 rounded-full p-2 sm:p-3 text-white"
           aria-label={isMuted ? "Unmute video" : "Mute video"}
         >
-          {isMuted ? <FaVolumeMute size={24} /> : <FaVolumeUp size={24} />}
+          {isMuted ? (
+            <FaVolumeMute className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+          ) : (
+            <FaVolumeUp className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+          )}
         </button>
       )}
 
       {/* Content Overlay */}
-      <div className="absolute top-[65%] pl-[4rem] lg:top-[40%] lg:pl-[8rem] w-[85%]">
-        <h1 className="text-white tracking-wide text-3xl w-full lg:text-5xl font-bold h-full drop-shadow-lg">
-          {movie?.title}
-        </h1>
-        <p className="text-white w-full mt-5 lg:w-[60%] lg:mt-8 drop-shadow-md">
-          {movie?.overview}
-        </p>
-        <div className="flex items-center gap-4 mt-5 lg:mt-7">
-          {onViewDetails && (
-            <button
-              onClick={onViewDetails}
-              className="text-white flex items-center justify-center gap-2 px-5 py-2 bg-slate-600 opacity-80 hover:opacity-100 transition-opacity rounded-md backdrop-blur-md"
-            >
-              <FaInfoCircle />
-              View Details
-            </button>
-          )}
+      <div className="absolute bottom-16 left-4 right-4 sm:bottom-20 sm:left-6 sm:right-6 md:bottom-24 md:left-8 md:right-8 lg:top-[40%] lg:left-16 lg:right-auto lg:bottom-auto lg:w-[85%] xl:left-20">
+        <div className="max-w-2xl lg:max-w-4xl">
+          <h1 className="text-white tracking-wide text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold drop-shadow-lg leading-tight mb-3 sm:mb-4 md:mb-5 lg:mb-6">
+            {movie?.title}
+          </h1>
+          <p className="text-white text-sm sm:text-base md:text-lg lg:text-base drop-shadow-md leading-relaxed mb-4 sm:mb-5 md:mb-6 lg:mb-8 lg:w-[70%] line-clamp-3 sm:line-clamp-4 lg:line-clamp-none">
+            {movie?.overview}
+          </p>
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+            {onViewDetails && (
+              <button
+                onClick={onViewDetails}
+                className="text-white flex items-center justify-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-slate-600 opacity-80 hover:opacity-100 transition-all duration-200 rounded-md backdrop-blur-md text-sm sm:text-base md:text-lg font-medium w-full sm:w-auto"
+              >
+                <FaInfoCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                View Details
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>
