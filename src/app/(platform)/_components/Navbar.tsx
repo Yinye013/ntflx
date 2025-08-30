@@ -5,8 +5,8 @@ import NavbarItem from "./NavbarItem";
 import MobileMenu from "./MobileMenu";
 import AccountMenu from "./AccountMenu";
 import Search from "./Search";
+import NotificationBell from "./NotificationBell";
 import { IoChevronDownSharp } from "react-icons/io5";
-import { FaBell } from "react-icons/fa";
 
 const Navbar = () => {
   // SHOWING MOBILE MENU
@@ -50,9 +50,7 @@ const Navbar = () => {
           <div className="text-gray-200 hover:text-gray-300 cursor-pointer">
             <Search />
           </div>
-          <div className="text-gray-200 hover:text-gray-300 cursor-pointer">
-            <FaBell size={18} />
-          </div>
+          <NotificationBell />
           <div className="flex flex-row items-center gap-2 cursor-pointer relative">
             <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-md overflow-hidden">
               <img
