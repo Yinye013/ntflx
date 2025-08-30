@@ -10,7 +10,7 @@ type CardProps = {
 
 const Card: React.FC<CardProps> = ({ castId, originalName, characterName, image }) => {
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = '/images/no-profile.png';
+    e.currentTarget.src = '/images/not-found.jpg';
   };
 
   return (

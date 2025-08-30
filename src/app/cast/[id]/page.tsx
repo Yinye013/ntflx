@@ -71,7 +71,7 @@ const CastPage: React.FC = () => {
                   image={
                     cast.profile_path
                       ? `https://image.tmdb.org/t/p/w500${cast.profile_path}`
-                      : "/images/no-profile.png"
+                      : "/images/not-found.jpg"
                   }
                 />
               ))}

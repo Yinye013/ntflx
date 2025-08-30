@@ -18,10 +18,10 @@ interface MovieCardProps {
   badges?: React.ReactNode[];
 }
 
-const MovieCard: React.FC<MovieCardProps> = ({ 
-  movie, 
+const MovieCard: React.FC<MovieCardProps> = ({
+  movie,
   showFavoriteButton = true,
-  badges = []
+  badges = [],
 }) => {
   return (
     <Link
@@ -29,17 +29,11 @@ const MovieCard: React.FC<MovieCardProps> = ({
       className="group cursor-pointer transition-transform duration-300 hover:scale-105"
     >
       <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800">
-        {movie.poster_path ? (
-          <img
-            src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-            alt={movie.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-400">
-            No Image
-          </div>
-        )}
+        <img
+          src={movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : '/images/not-found.jpg'}
+          alt={movie.title}
+          className="w-full h-full object-cover"
+        />
 
         {/* Favorite Button */}
         {showFavoriteButton && (
@@ -50,7 +44,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
 
         {/* Custom badges (like Coming Soon, Rating, etc.) */}
         {badges.map((badge, index) => (
-          <div key={index}>
+          <div key={index} className="absolute bottom-2 left-2 z-10">
             {badge}
           </div>
         ))}

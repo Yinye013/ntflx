@@ -62,7 +62,7 @@ const TrendingPage: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex min-h-screen justify-center py-20">
             <div className="text-white text-lg">Loading trending movies...</div>
           </div>
         )}
@@ -115,10 +115,7 @@ const TrendingPage: React.FC = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {data.results.map((movie) => (
-                <MovieCard
-                  key={movie.id}
-                  movie={movie}
-                />
+                <MovieCard key={movie.id} movie={movie} />
               ))}
             </div>
           </div>

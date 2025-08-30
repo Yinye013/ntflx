@@ -1,12 +1,15 @@
 "use client";
 import React from "react";
+import Link from "next/link";
 import MainLayout from "../../mainlayout";
 import usePersonDetails from "../../hooks/usePersonDetails";
+import usePersonMovies from "../../hooks/usePersonMovies";
 import { useParams } from "next/navigation";
 
 const PersonDetailsPage: React.FC = () => {
   const { id } = useParams();
   const { data, error, isLoading } = usePersonDetails(id);
+  const { data: movieCredits } = usePersonMovies(id);
 
   if (!id) {
     return (
@@ -83,32 +86,20 @@ const PersonDetailsPage: React.FC = () => {
         {data && (
           <div className="space-y-8">
             {/* Header Section */}
-            <div className="flex flex-col lg:flex-row gap-8">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-center gap-8">
               {/* Profile Image */}
               <div className="flex-shrink-0">
                 <div className="w-64 mx-auto lg:mx-0">
                   <div className="aspect-[3/4] rounded-lg overflow-hidden bg-gray-700">
-                    {data.profile_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${data.profile_path}`}
-                        alt={data.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        <svg
-                          className="w-24 h-24"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </div>
-                    )}
+                    <img
+                      src={
+                        data.profile_path
+                          ? `https://image.tmdb.org/t/p/w500${data.profile_path}`
+                          : "/images/not-found.jpg"
+                      }
+                      alt={data.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
@@ -209,6 +200,129 @@ const PersonDetailsPage: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Movie Credits */}
+            {movieCredits &&
+              (movieCredits.cast.length > 0 ||
+                movieCredits.crew.length > 0) && (
+                <div className="space-y-6">
+                  <h2 className="text-2xl text-white font-bold">Filmography</h2>
+
+                  {/* Cast Credits */}
+                  {movieCredits.cast.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-xl text-white font-semibold">
+                        Acting
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {movieCredits.cast
+                          .sort(
+                            (a, b) =>
+                              new Date(b.release_date || "").getTime() -
+                              new Date(a.release_date || "").getTime()
+                          )
+                          .slice(0, 12)
+                          .map((movie) => (
+                            <Link
+                              key={movie.id}
+                              href={`/details/${movie.id}`}
+                              className="flex gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors duration-200 group"
+                            >
+                              <div className="flex-shrink-0 w-16 h-20">
+                                <img
+                                  src={
+                                    movie.poster_path
+                                      ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`
+                                      : "/images/not-found.jpg"
+                                  }
+                                  alt={movie.title}
+                                  className="w-full h-full object-cover rounded"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors truncate">
+                                  {movie.title}
+                                </h4>
+                                <p className="text-gray-400 text-xs mb-1">
+                                  {movie.release_date
+                                    ? new Date(movie.release_date).getFullYear()
+                                    : "TBA"}
+                                </p>
+                                {movie.character && (
+                                  <p className="text-gray-300 text-xs">
+                                    as {movie.character}
+                                  </p>
+                                )}
+                              </div>
+                            </Link>
+                          ))}
+                      </div>
+                      {movieCredits.cast.length > 12 && (
+                        <p className="text-gray-400 text-sm">
+                          And {movieCredits.cast.length - 12} more movies...
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Crew Credits */}
+                  {movieCredits.crew.length > 0 && (
+                    <div className="space-y-4">
+                      <h3 className="text-xl text-white font-semibold">
+                        Production
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {movieCredits.crew
+                          .sort(
+                            (a, b) =>
+                              new Date(b.release_date || "").getTime() -
+                              new Date(a.release_date || "").getTime()
+                          )
+                          .slice(0, 8)
+                          .map((movie) => (
+                            <Link
+                              key={`${movie.id}-${movie.job}`}
+                              href={`/details/${movie.id}`}
+                              className="flex gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors duration-200 group"
+                            >
+                              <div className="flex-shrink-0 w-16 h-20">
+                                <img
+                                  src={
+                                    movie.poster_path
+                                      ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`
+                                      : "/images/not-found.jpg"
+                                  }
+                                  alt={movie.title}
+                                  className="w-full h-full object-cover rounded"
+                                />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-white font-medium text-sm group-hover:text-blue-400 transition-colors truncate">
+                                  {movie.title}
+                                </h4>
+                                <p className="text-gray-400 text-xs mb-1">
+                                  {movie.release_date
+                                    ? new Date(movie.release_date).getFullYear()
+                                    : "TBA"}
+                                </p>
+                                {movie.job && (
+                                  <p className="text-gray-300 text-xs">
+                                    {movie.job}
+                                  </p>
+                                )}
+                              </div>
+                            </Link>
+                          ))}
+                      </div>
+                      {movieCredits.crew.length > 8 && (
+                        <p className="text-gray-400 text-sm">
+                          And {movieCredits.crew.length - 8} more credits...
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
             {/* External Links */}
             <div className="flex gap-4">

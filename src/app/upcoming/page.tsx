@@ -37,7 +37,7 @@ const UpcomingPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="pt-[130px] px-4 md:px-8 lg:px-16 bg-gradient-to-b from-black via-gray-900 to-black">
+      <div className="pt-[130px] px-4 md:px-8 lg:px-16 bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl md:text-3xl text-white font-semibold mb-4">
@@ -50,7 +50,7 @@ const UpcomingPage: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex justify-center py-20 min-h-screen">
             <div className="text-white text-lg">Loading upcoming movies...</div>
           </div>
         )}
@@ -101,23 +101,25 @@ const UpcomingPage: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.results.map((movie) => {
-                const comingSoonBadge = isComingSoon(movie.release_date) ? (
-                  <div className="absolute top-2 left-2 bg-red-600 px-2 py-1 rounded-md z-10">
-                    <span className="text-white text-xs font-semibold">
-                      Coming Soon
-                    </span>
-                  </div>
-                ) : null;
+              {data.results
+                .filter((movie) => isComingSoon(movie.release_date))
+                .map((movie) => {
+                  const comingSoonBadge = (
+                    <div className="bg-red-600 px-2 py-1 rounded-md">
+                      <span className="text-white text-xs font-semibold">
+                        Coming Soon
+                      </span>
+                    </div>
+                  );
 
-                return (
-                  <MovieCard
-                    key={movie.id}
-                    movie={movie}
-                    badges={comingSoonBadge ? [comingSoonBadge] : []}
-                  />
-                );
-              })}
+                  return (
+                    <MovieCard
+                      key={movie.id}
+                      movie={movie}
+                      badges={[comingSoonBadge]}
+                    />
+                  );
+                })}
             </div>
           </div>
         )}
