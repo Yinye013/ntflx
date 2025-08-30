@@ -74,6 +74,29 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
 
+      // For OAuth providers (Google, GitHub), create user in database if they don't exist
+      if (account?.provider && account.provider !== "credentials" && user.email) {
+        try {
+          const existingUser = await prisma.user.findUnique({
+            where: { email: user.email },
+          });
+
+          if (!existingUser) {
+            await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name || "User",
+                image: user.image || "",
+              },
+            });
+            console.log("Created new OAuth user:", user.email);
+          }
+        } catch (error) {
+          console.error("Error creating OAuth user:", error);
+          return false;
+        }
+      }
+
       return true;
     },
     async jwt({ token, user }) {
