@@ -1,27 +1,14 @@
 import { NextRequest } from "next/server";
-import { getSession } from "next-auth/react";
+import { getServerSession } from "next-auth/next";
 import { PrismaClient } from "@prisma/client";
-import { NextApiRequest } from "next";
+import { authOptions } from "./authOptions";
 
 const prisma = new PrismaClient();
 
-function nextRequestToApiRequest(req: NextRequest): NextApiRequest {
-  const headers: Record<string, string | string[]> = {};
-  req.headers.forEach((value, key) => {
-    headers[key] = value;
-  });
+const serverAuth = async (_req: NextRequest) => {
+  const session = await getServerSession(authOptions);
 
-  return {
-    ...req,
-    headers,
-  } as unknown as NextApiRequest;
-}
-
-const serverAuth = async (req: NextRequest) => {
-  const apiReq = nextRequestToApiRequest(req);
-  const session = await getSession({ req: apiReq });
-
-  console.log(session);
+  console.log("Server session:", session);
 
   if (!session?.user?.email) {
     throw new Error("Not signed in!");
