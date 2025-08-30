@@ -226,7 +226,7 @@ const PersonDetailsPage: React.FC = () => {
                             <Link
                               key={movie.id}
                               href={`/details/${movie.id}`}
-                              className="flex gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors duration-200 group"
+                              className="flex items-center justify-center gap-3 p-3 rounded-lg bg-gray-800 hover:bg-gray-700 transition-colors duration-200 group"
                             >
                               <div className="flex-shrink-0 w-16 h-20">
                                 <img

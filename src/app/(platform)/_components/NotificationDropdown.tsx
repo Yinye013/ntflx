@@ -10,11 +10,18 @@ interface NotificationDropdownProps {
   onClose?: () => void;
 }
 
-const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ 
-  visible = false, 
-  onClose 
+const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
+  visible = false,
+  onClose,
 }) => {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, isLoading } = useNotifications({
+  const {
+    notifications,
+    unreadCount,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    isLoading,
+  } = useNotifications({
     limit: 10,
     refreshInterval: 30000,
   });
@@ -35,10 +42,12 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
     const now = new Date();
     const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
 
-    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    if (diffInSeconds < 604800)
+      return `${Math.floor(diffInSeconds / 86400)}d ago`;
     return date.toLocaleDateString();
   };
 
@@ -55,7 +64,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
             </span>
           )}
         </div>
-        
+
         <div className="flex items-center space-x-2">
           {unreadCount > 0 && (
             <button
@@ -75,15 +84,19 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
       </div>
 
       {/* Notifications List */}
-      <div className="max-h-80 overflow-y-auto">
+      <div className="max-h-80 overflow-y-auto p-4">
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="text-gray-400 text-sm">Loading notifications...</div>
+            <div className="text-gray-400 text-sm">
+              Loading notifications...
+            </div>
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <FaBell className="text-gray-600 mb-2" size={24} />
-            <div className="text-gray-400 text-sm mb-1">No notifications yet</div>
+            <div className="text-gray-400 text-sm mb-1">
+              No notifications yet
+            </div>
             <div className="text-gray-500 text-xs">
               We'll notify you when your favorite movies are released
             </div>
@@ -94,7 +107,7 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
               <div
                 key={notification.id}
                 className={`relative p-4 hover:bg-gray-800 transition-colors cursor-pointer ${
-                  !notification.isRead ? 'bg-gray-800/50' : ''
+                  !notification.isRead ? "bg-gray-800/50" : ""
                 }`}
                 onClick={() => handleNotificationClick(notification)}
               >
@@ -123,14 +136,20 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h4 className={`text-sm font-medium ${
-                          notification.isRead ? 'text-gray-300' : 'text-white'
-                        } truncate`}>
+                        <h4
+                          className={`text-sm font-medium ${
+                            notification.isRead ? "text-gray-300" : "text-white"
+                          } truncate`}
+                        >
                           {notification.title}
                         </h4>
-                        <p className={`text-xs mt-1 ${
-                          notification.isRead ? 'text-gray-500' : 'text-gray-400'
-                        }`}>
+                        <p
+                          className={`text-xs mt-1 ${
+                            notification.isRead
+                              ? "text-gray-500"
+                              : "text-gray-400"
+                          }`}
+                        >
                           {notification.message}
                         </p>
                         <p className="text-xs text-gray-500 mt-2">
@@ -143,7 +162,11 @@ const NotificationDropdown: React.FC<NotificationDropdownProps> = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            setShowActions(showActions === notification.id ? null : notification.id);
+                            setShowActions(
+                              showActions === notification.id
+                                ? null
+                                : notification.id
+                            );
                           }}
                           className="text-gray-500 hover:text-gray-300 transition-colors p-1"
                         >

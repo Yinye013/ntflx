@@ -61,7 +61,7 @@ const MovieBanner = () => {
       ) : (
         /* Fallback Background Image */
         <div
-          className="w-full min-h-screen bg-cover bg-center bg-no-repeat brightness-50"
+          className="w-full min-h-screenz bg-cover bg-center bg-no-repeat brightness-50"
           style={{
             backgroundImage: movie?.backdrop_path
               ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`

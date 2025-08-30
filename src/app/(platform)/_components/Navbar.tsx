@@ -24,7 +24,7 @@ const Navbar = () => {
     <nav className="w-full fixed top-0 left-0 z-40 bg-black bg-opacity-10 backdrop-blur-sm">
       <div className="flex flex-row items-center justify-between px-4 md:px-8 lg:px-16 py-4 transition duration-500">
         {/* Left Section - Logo & Navigation */}
-        <div className="flex flex-row items-center lg:gap-40">
+        <div className="flex flex-row items-center lg:gap-64">
           <Logo />
           <div className="flex-row gap-7 hidden lg:flex">
             <NavbarItem label={"Home"} link={"/"} />
