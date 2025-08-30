@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import BackButton from "./BackButton";
+// import BackButton from "./BackButton";
 import Rating from "./Rating";
 import { format, parse } from "date-fns";
 import { ClipLoader } from "react-spinners";
@@ -115,9 +115,9 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
       : movie?.overview?.slice(0, 300) + "...";
 
   return (
-    <div className="bg-gradient-to-b from-black via-gray-900 to-black">
+    <div className="bg-gradient-to-b from-black via-gray-900 to-black pt-[70px] ">
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 py-12">
-        <BackButton />
+        {/* <BackButton /> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12 mt-8">
           {/* Movie Poster */}

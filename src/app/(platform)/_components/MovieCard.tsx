@@ -25,7 +25,7 @@ const MovieCard: React.FC<MovieCardProps> = ({
 }) => {
   return (
     <Link
-      href={`/details/${movie.id}`}
+      href={`/movie/${movie.id}`}
       className="group cursor-pointer transition-transform duration-300 hover:scale-105"
     >
       <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800">
