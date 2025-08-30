@@ -23,16 +23,18 @@ function Profiles() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center h-screen items-center">
+      <div className="flex justify-center h-screen items-center bg-gradient-to-b from-black via-gray-900 to-black">
         <div className="text-white text-xl">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="flex justify-center h-screen items-center bg-black">
+    <div className="flex justify-center h-screen items-center bg-gradient-to-b from-black via-gray-900 to-black">
       <div className="flex flex-col">
-        <h1 className="text-white text-3xl md:text-6xl text-center">Who's watching?</h1>
+        <h1 className="text-white text-3xl md:text-6xl text-center">
+          Who's watching?
+        </h1>
 
         <div className="flex items-center justify-center gap-8 mt-10">
           <div

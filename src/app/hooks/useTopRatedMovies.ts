@@ -3,12 +3,12 @@ import axios from "axios";
 
 const fetcher = async (url: string) => {
   try {
-    console.log(`Fetching trending movies from ${url}`);
+    console.log(`Fetching top rated movies from ${url}`);
     const response = await axios.get(url);
-    console.log("Trending movies response:", response.data);
+    console.log("Top rated movies response:", response.data);
     return response.data;
   } catch (error: any) {
-    throw new Error(`Failed to fetch trending movies from ${url}: ${error.message}`);
+    throw new Error(`Failed to fetch top rated movies from ${url}: ${error.message}`);
   }
 };
 
@@ -25,7 +25,7 @@ interface Movie {
   genre_ids: number[];
 }
 
-interface TrendingMoviesResponse {
+interface TopRatedMoviesResponse {
   page: number;
   results: Movie[];
   total_pages: number;
@@ -35,10 +35,10 @@ interface TrendingMoviesResponse {
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
-const useTrendingMovies = (timeWindow: 'day' | 'week' = 'day', page: number = 1) => {
-  const { data, error, isLoading, isValidating, mutate } = useSWR<TrendingMoviesResponse>(
+const useTopRatedMovies = (page: number = 1) => {
+  const { data, error, isLoading, isValidating, mutate } = useSWR<TopRatedMoviesResponse>(
     TMDB_API_KEY && TMDB_API_URL
-      ? `${TMDB_API_URL}/trending/movie/${timeWindow}?api_key=${TMDB_API_KEY}&page=${page}`
+      ? `${TMDB_API_URL}/movie/top_rated?api_key=${TMDB_API_KEY}&page=${page}`
       : null,
     fetcher
   );
@@ -52,4 +52,4 @@ const useTrendingMovies = (timeWindow: 'day' | 'week' = 'day', page: number = 1)
   };
 };
 
-export default useTrendingMovies;
+export default useTopRatedMovies;

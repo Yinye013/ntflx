@@ -29,7 +29,25 @@ model User {
   favoriteIds String[] @db.ObjectId
   sessions Session[]
   accounts Account[]
+  favorites Favorite[]
 
+}
+
+model Favorite {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  movieId Int
+  title String
+  posterPath String?
+  backdropPath String?
+  overview String?
+  releaseDate String?
+  voteAverage Float?
+  addedAt DateTime @default(now())
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, movieId])
 }
 
 // model created once we use Google or Github to log in

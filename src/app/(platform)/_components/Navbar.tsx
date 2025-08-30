@@ -29,7 +29,7 @@ const Navbar = () => {
           <div className="flex-row gap-7 hidden lg:flex">
             <NavbarItem label={"Home"} link={"/"} />
             <NavbarItem label={"Trending"} link={"/trending"} />
-            <NavbarItem label={"Top Rated"} link={"/top_Rated"} />
+            <NavbarItem label={"Top Rated"} link={"/top-rated"} />
             <NavbarItem label={"Upcoming"} link={"/upcoming"} />
             <NavbarItem label={"My List"} link={"/favorites"} />
           </div>

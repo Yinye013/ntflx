@@ -41,12 +41,12 @@ interface SearchResponse {
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;
 const TMDB_API_URL = process.env.NEXT_PUBLIC_TMDB_URL;
 
-const useSearchMovies = (query: string) => {
+const useSearchMovies = (query: string, page: number = 1) => {
   const shouldFetch = query && query.trim() !== '';
   
   const { data, error, isLoading, isValidating, mutate } = useSWR<SearchResponse>(
     shouldFetch
-      ? `${TMDB_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}`
+      ? `${TMDB_API_URL}/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(query)}&page=${page}`
       : null,
     fetcher
   );

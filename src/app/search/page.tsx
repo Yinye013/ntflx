@@ -1,15 +1,17 @@
 "use client";
 
-import React, { useEffect, Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import MainLayout from "../mainlayout";
 import { useSearch } from "../context/SearchContext";
 import useSearchMovies from "../hooks/useSearchMovies";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
+import MovieCard from "../(platform)/_components/MovieCard";
 
 const SearchPageContent: React.FC = () => {
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get("q") || "";
+  const [page, setPage] = useState(1);
+  
   const {
     query,
     setQuery,
@@ -25,20 +27,39 @@ const SearchPageContent: React.FC = () => {
     }
   }, [urlQuery, query, setQuery]);
 
+  // Reset page to 1 when query changes
+  useEffect(() => {
+    setPage(1);
+  }, [query, urlQuery]);
+
   // Use URL query if context query is empty
   const activeQuery = query || urlQuery;
 
-  // Fallback: also trigger search on this page in case context data is missing
+  // Use hook data with pagination for search results page
   const {
     data: hookData,
     error: hookError,
     isLoading: hookLoading,
-  } = useSearchMovies(activeQuery);
+  } = useSearchMovies(activeQuery, page);
 
-  // Use context data if available, otherwise use hook data
-  const data = contextData || hookData;
-  const error = contextError || hookError;
-  const isLoading = contextLoading || hookLoading;
+  // For search page, prioritize hook data with pagination over context data
+  const data = hookData || contextData;
+  const error = hookError || contextError;
+  const isLoading = hookLoading || contextLoading;
+
+  const handleNextPage = () => {
+    if (data && page < data.total_pages) {
+      setPage(page + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <MainLayout>
@@ -75,47 +96,49 @@ const SearchPageContent: React.FC = () => {
         {/* Search Results */}
         {data && data.results && (
           <div className="space-y-6">
-            <div className="text-gray-300 text-sm">
-              Found {data.total_results} results
+            <div className="flex justify-between items-center text-gray-300 text-sm">
+              <div>
+                Found {data.total_results} results for "{activeQuery}"
+                {data.total_pages > 1 && (
+                  <span> - Page {page} of {data.total_pages}</span>
+                )}
+              </div>
+              
+              {/* Pagination Controls */}
+              {data.total_pages > 1 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={page === 1}
+                    className={`px-3 py-1 rounded-md transition-all duration-200 ${
+                      page === 1
+                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={!data || page >= data.total_pages}
+                    className={`px-3 py-1 rounded-md transition-all duration-200 ${
+                      !data || page >= data.total_pages
+                        ? 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
               {data.results.map((movie) => (
-                <Link
+                <MovieCard
                   key={movie.id}
-                  href={`/details/${movie.id}`}
-                  className="group cursor-pointer transition-transform duration-300 hover:scale-105"
-                >
-                  <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-gray-800">
-                    {movie.poster_path ? (
-                      <img
-                        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                        alt={movie.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400">
-                        No Image
-                      </div>
-                    )}
-
-                    {/* Overlay with movie info */}
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300 flex flex-col justify-end p-3 opacity-0 group-hover:opacity-100">
-                      <div className="text-white text-sm font-medium mb-1 truncate">
-                        {movie.title}
-                      </div>
-                      <div className="text-gray-300 text-xs">
-                        {movie.release_date?.split("-")[0]}
-                      </div>
-                      <div className="flex items-center mt-1">
-                        <span className="text-yellow-400 text-xs">★</span>
-                        <span className="text-gray-300 text-xs ml-1">
-                          {movie.vote_average?.toFixed(1)}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+                  movie={movie}
+                />
               ))}
             </div>
           </div>
