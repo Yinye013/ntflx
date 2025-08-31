@@ -1,29 +1,63 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "../mainlayout";
-import useTrendingMovies from "../hooks/useTrendingMovies";
 import MovieCard from "../(platform)/_components/MovieCard";
+import useInfiniteScrollMovies from "../hooks/useInfiniteScrollMovies";
+import useIntersectionObserver from "../hooks/useIntersectionObserver";
+import { ClipLoader } from "react-spinners";
 
 const TrendingPage: React.FC = () => {
+  console.log("TrendingPage component rendering");
+
   const [timeWindow, setTimeWindow] = useState<"day" | "week">("day");
-  const [page, setPage] = useState(1);
-  const { data, error, isLoading } = useTrendingMovies(timeWindow, page);
 
-  const handleNextPage = () => {
-    if (data && page < data.total_pages) {
-      setPage(page + 1);
-    }
-  };
+  console.log("About to call useInfiniteScrollMovies");
+  const {
+    movies,
+    isLoading,
+    isLoadingMore,
+    error,
+    hasMore,
+    totalResults,
+    loadMore,
+    reset,
+  } = useInfiniteScrollMovies({
+    endpoint: "/trending/movie",
+    timeWindow,
+  });
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  };
+  console.log("useInfiniteScrollMovies returned:", {
+    moviesCount: movies.length,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    error,
+  });
+
+  console.log("About to create intersection observer with:", {
+    hasMore,
+    isLoadingMore,
+    enabled: hasMore && !isLoadingMore,
+  });
+
+  const loadMoreRef = useIntersectionObserver({
+    onIntersect: loadMore,
+    enabled: hasMore && !isLoadingMore,
+  });
+
+  console.log("loadMoreRef created:", loadMoreRef);
+
+  console.log("TrendingPage final state:", {
+    moviesCount: movies.length,
+    isLoading,
+    isLoadingMore,
+    hasMore,
+    timeWindow,
+    observerEnabled: hasMore && !isLoadingMore,
+  });
 
   const handleTimeWindowChange = (newTimeWindow: "day" | "week") => {
     setTimeWindow(newTimeWindow);
-    setPage(1); // Reset to first page when changing time window
   };
 
   return (
@@ -62,8 +96,8 @@ const TrendingPage: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex min-h-screen justify-center py-20">
-            <div className="text-white text-lg">Loading trending movies...</div>
+          <div className="flex min-h-screen justify-center items-center py-20">
+            <ClipLoader size={60} color={"#E50913"} loading={true} />
           </div>
         )}
 
@@ -71,58 +105,61 @@ const TrendingPage: React.FC = () => {
         {error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-red-500 text-lg">
-              Error loading trending movies: {error.message}
+              Error loading trending movies: {error}
             </div>
           </div>
         )}
 
         {/* Trending Movies Results */}
-        {data && data.results && (
+        {!isLoading && movies.length > 0 && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center text-gray-300 text-sm">
-              <div>
-                Found {data.total_results} trending movies (
-                {timeWindow === "day" ? "today" : "this week"}) - Page {page} of{" "}
-                {data.total_pages}
-              </div>
-
-              {/* Pagination Controls */}
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={page === 1}
-                  className={`px-3 py-1 rounded-md transition-all duration-200 ${
-                    page === 1
-                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={handleNextPage}
-                  disabled={!data || page >= data.total_pages}
-                  className={`px-3 py-1 rounded-md transition-all duration-200 ${
-                    !data || page >= data.total_pages
-                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
+            <div className="text-gray-300 text-sm">
+              Found {totalResults} trending movies (
+              {timeWindow === "day" ? "today" : "this week"}) - Showing{" "}
+              {movies.length}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.results.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {movies.map((movie, index) => (
+                <MovieCard key={`${movie.id}-${index}`} movie={movie} />
               ))}
             </div>
+
+            {/* Load More Trigger */}
+            {hasMore && (
+              <div
+                ref={loadMoreRef}
+                className="flex justify-center py-8 min-h-[100px] bg-gray-800/20"
+                style={{ border: "1px solid red" }} // Debug visual
+              >
+                {isLoadingMore ? (
+                  <div className="flex items-center gap-3">
+                    <ClipLoader size={24} color={"#E50913"} loading={true} />
+                    <span className="text-gray-300">
+                      Loading more movies...
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-gray-400 text-sm">
+                    Scroll to load more...
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasMore && movies.length > 0 && (
+              <div className="flex justify-center py-8">
+                <div className="text-gray-400 text-sm">
+                  You've reached the end! No more movies to load.
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* No Results */}
-        {data && data.results && data.results.length === 0 && (
+        {!isLoading && movies.length === 0 && !error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-gray-400 text-lg">
               No trending movies found

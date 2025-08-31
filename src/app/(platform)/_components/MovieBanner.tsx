@@ -61,7 +61,7 @@ const MovieBanner = () => {
       ) : (
         /* Fallback Background Image */
         <div
-          className="w-full min-h-screenz bg-cover bg-center bg-no-repeat brightness-50"
+          className="w-full h-[100vh] bg-cover bg-center bg-no-repeat brightness-50"
           style={{
             backgroundImage: movie?.backdrop_path
               ? `url(https://image.tmdb.org/t/p/original${movie.backdrop_path})`
@@ -86,7 +86,7 @@ const MovieBanner = () => {
       )}
 
       {/* Content Overlay */}
-      <div className="absolute bottom-16 left-4 right-4 sm:bottom-20 sm:left-6 sm:right-6 md:bottom-24 md:left-8 md:right-8 lg:top-[40%] lg:left-16 lg:right-auto lg:bottom-auto lg:w-[85%] xl:left-20">
+      <div className="absolute bottom-16 left-4 right-4 sm:bottom-20 sm:left-6 sm:right-6 md:bottom-24 md:left-8 md:right-8 lg:top-1/2 lg:-translate-y-1/2 lg:left-16 lg:right-auto lg:bottom-auto lg:w-[85%] xl:left-20">
         <div className="max-w-2xl lg:max-w-4xl">
           <h1 className="text-white tracking-wide text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold drop-shadow-lg leading-tight mb-3 sm:mb-4 md:mb-5 lg:mb-6">
             {movie?.title}
