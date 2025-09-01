@@ -24,6 +24,7 @@ interface MovieResponse {
 interface UseInfiniteScrollMoviesProps {
   endpoint: string; // e.g., '/trending/movie/day', '/movie/top_rated', etc.
   timeWindow?: 'day' | 'week';
+  query?: string; // For search functionality
 }
 
 const TMDB_API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY;

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import useRandomMovies from "@/app/hooks/useRandomMovies";
-import { ClipLoader } from "react-spinners";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import Link from "next/link";
 import { FaInfoCircle, FaVolumeUp, FaVolumeMute } from "react-icons/fa";
 
@@ -12,8 +12,8 @@ const MovieBanner = () => {
 
   if (loading)
     return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <ClipLoader size={120} color={"#E50913"} loading={true} />
+      <div className="fixed inset-0">
+        <LoadingSpinner />
       </div>
     );
   if (error)
@@ -101,7 +101,7 @@ const MovieBanner = () => {
               className="text-white flex items-center justify-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 md:px-6 md:py-3 bg-slate-600 opacity-80 hover:opacity-100 transition-all duration-200 rounded-md backdrop-blur-md text-sm sm:text-base md:text-lg font-medium w-full sm:w-auto"
             >
               {linkLoading ? (
-                <ClipLoader size={16} color={"#fff"} loading={true} />
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               ) : (
                 <>
                   <FaInfoCircle className="w-4 h-4 sm:w-5 sm:h-5" />

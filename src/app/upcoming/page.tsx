@@ -1,33 +1,29 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import MainLayout from "../mainlayout";
-import useUpcomingMovies from "../hooks/useUpcomingMovies";
+import useInfiniteScrollMovies from "../hooks/useInfiniteScrollMovies";
+import useIntersectionObserver from "../hooks/useIntersectionObserver";
 import MovieCard from "../(platform)/_components/MovieCard";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 const UpcomingPage: React.FC = () => {
-  const [page, setPage] = useState(1);
-  const { data, error, isLoading } = useUpcomingMovies(page);
+  const {
+    movies,
+    isLoading,
+    isLoadingMore,
+    error,
+    hasMore,
+    totalResults,
+    loadMore,
+  } = useInfiniteScrollMovies({
+    endpoint: '/movie/upcoming',
+  });
 
-  const handleNextPage = () => {
-    if (data && page < data.total_pages) {
-      setPage(page + 1);
-    }
-  };
+  const loadMoreRef = useIntersectionObserver({
+    onIntersect: loadMore,
+    enabled: hasMore && !isLoadingMore,
+  });
 
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  };
-
-  const formatReleaseDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   const isComingSoon = (dateString: string) => {
     const releaseDate = new Date(dateString);
@@ -50,8 +46,8 @@ const UpcomingPage: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex justify-center py-20 min-h-screen">
-            <div className="text-white text-lg">Loading upcoming movies...</div>
+          <div className="min-h-screen">
+            <LoadingSpinner />
           </div>
         )}
 
@@ -59,51 +55,22 @@ const UpcomingPage: React.FC = () => {
         {error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-red-500 text-lg">
-              Error loading upcoming movies: {error.message}
+              Error loading upcoming movies: {error}
             </div>
           </div>
         )}
 
         {/* Upcoming Movies Results */}
-        {data && data.results && (
+        {!isLoading && movies.length > 0 && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center text-gray-300 text-sm">
-              <div>
-                Found {data.total_results} upcoming movies (Page {page} of{" "}
-                {data.total_pages})
-              </div>
-
-              {/* Pagination Controls */}
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={page === 1}
-                  className={`px-3 py-1 rounded-md transition-all duration-200 ${
-                    page === 1
-                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={handleNextPage}
-                  disabled={!data || page >= data.total_pages}
-                  className={`px-3 py-1 rounded-md transition-all duration-200 ${
-                    !data || page >= data.total_pages
-                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
+            <div className="text-gray-300 text-sm">
+              Found {totalResults} upcoming movies - Showing {movies.length}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.results
+              {movies
                 .filter((movie) => isComingSoon(movie.release_date))
-                .map((movie) => {
+                .map((movie, index) => {
                   const comingSoonBadge = (
                     <div className="bg-red-600 px-2 py-1 rounded-md">
                       <span className="text-white text-xs font-semibold">
@@ -114,18 +81,48 @@ const UpcomingPage: React.FC = () => {
 
                   return (
                     <MovieCard
-                      key={movie.id}
+                      key={`${movie.id}-${index}`}
                       movie={movie}
                       badges={[comingSoonBadge]}
                     />
                   );
                 })}
             </div>
+
+            {/* Load More Trigger */}
+            {hasMore && (
+              <div
+                ref={loadMoreRef}
+                className="flex justify-center py-8 min-h-[100px]"
+              >
+                {isLoadingMore ? (
+                  <div className="flex items-center gap-3">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
+                    <span className="text-gray-300">
+                      Loading more movies...
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-gray-400 text-sm">
+                    Scroll to load more...
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasMore && movies.length > 0 && (
+              <div className="flex justify-center py-8">
+                <div className="text-gray-400 text-sm">
+                  You've reached the end! No more movies to load.
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* No Results */}
-        {data && data.results && data.results.length === 0 && (
+        {!isLoading && movies.length === 0 && !error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-gray-400 text-lg">
               No upcoming movies found

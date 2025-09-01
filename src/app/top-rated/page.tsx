@@ -1,24 +1,28 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import MainLayout from "../mainlayout";
-import useTopRatedMovies from "../hooks/useTopRatedMovies";
+import useInfiniteScrollMovies from "../hooks/useInfiniteScrollMovies";
+import useIntersectionObserver from "../hooks/useIntersectionObserver";
 import MovieCard from "../(platform)/_components/MovieCard";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 const TopRatedPage: React.FC = () => {
-  const [page, setPage] = useState(1);
-  const { data, error, isLoading } = useTopRatedMovies(page);
+  const {
+    movies,
+    isLoading,
+    isLoadingMore,
+    error,
+    hasMore,
+    totalResults,
+    loadMore,
+  } = useInfiniteScrollMovies({
+    endpoint: "/movie/top_rated",
+  });
 
-  const handleNextPage = () => {
-    if (data && page < data.total_pages) {
-      setPage(page + 1);
-    }
-  };
-
-  const handlePrevPage = () => {
-    if (page > 1) {
-      setPage(page - 1);
-    }
-  };
+  const loadMoreRef = useIntersectionObserver({
+    onIntersect: loadMore,
+    enabled: hasMore && !isLoadingMore,
+  });
 
   return (
     <MainLayout>
@@ -35,10 +39,8 @@ const TopRatedPage: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex min-h-screen justify-center py-20">
-            <div className="text-white text-lg">
-              Loading top rated movies...
-            </div>
+          <div className="min-h-screen">
+            <LoadingSpinner />
           </div>
         )}
 
@@ -46,58 +48,59 @@ const TopRatedPage: React.FC = () => {
         {error && (
           <div className="flex items-center justify-center py-20">
             <div className="text-red-500 text-lg">
-              Error loading top rated movies: {error.message}
+              Error loading top rated movies: {error}
             </div>
           </div>
         )}
 
         {/* Top Rated Movies Results */}
-        {data && data.results && (
+        {!isLoading && movies.length > 0 && (
           <div className="space-y-6">
-            <div className="flex justify-between items-center text-gray-300 text-sm">
-              <div>
-                Found {data.total_results} top rated movies (Page {page} of{" "}
-                {data.total_pages})
-              </div>
-
-              {/* Pagination Controls */}
-              <div className="flex gap-2">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={page === 1}
-                  className={`px-3 py-1 rounded-md transition-all duration-200 ${
-                    page === 1
-                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={handleNextPage}
-                  disabled={!data || page >= data.total_pages}
-                  className={`px-3 py-1 rounded-md transition-all duration-200 ${
-                    !data || page >= data.total_pages
-                      ? "bg-gray-700 text-gray-500 cursor-not-allowed"
-                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
+            <div className="text-gray-300 text-sm">
+              Found {totalResults} top rated movies - Showing {movies.length}
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {data.results.map((movie) => (
-                <MovieCard key={movie.id} movie={movie} />
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {movies.map((movie, index) => (
+                <MovieCard key={`${movie.id}-${index}`} movie={movie} />
               ))}
             </div>
+
+            {/* Load More Trigger */}
+            {hasMore && (
+              <div
+                ref={loadMoreRef}
+                className="flex justify-center py-8 min-h-[100px]"
+              >
+                {isLoadingMore ? (
+                  <div className="flex items-center gap-3">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
+                    <span className="text-gray-300">
+                      Loading more movies...
+                    </span>
+                  </div>
+                ) : (
+                  <div className="text-gray-400 text-sm">
+                    Scroll to load more...
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* End of Results */}
+            {!hasMore && movies.length > 0 && (
+              <div className="flex justify-center py-8">
+                <div className="text-gray-400 text-sm">
+                  You've reached the end! No more movies to load.
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* No Results */}
-        {data && data.results && data.results.length === 0 && (
-          <div className="flex items-center justify-center py-20">
+        {!isLoading && movies.length === 0 && !error && (
+          <div className="flex items-center justify-center py-20 min-h-screen">
             <div className="text-gray-400 text-lg">
               No top rated movies found
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { ClipLoader } from "react-spinners";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import { FaVolumeUp, FaVolumeMute, FaInfoCircle } from "react-icons/fa";
 import useMovieVideos from "@/app/hooks/useMovieVideos";
 
@@ -22,8 +22,8 @@ const MovieDetailBanner: React.FC<MovieDetailBannerProps> = ({
 
   if (isLoading) {
     return (
-      <div className="relative w-full h-[100vh] flex items-center justify-center bg-black">
-        <ClipLoader size={120} color={"#E50913"} loading={true} />
+      <div className="relative w-full h-[100vh] bg-black">
+        <LoadingSpinner />
       </div>
     );
   }

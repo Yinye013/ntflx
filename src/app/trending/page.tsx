@@ -4,7 +4,7 @@ import MainLayout from "../mainlayout";
 import MovieCard from "../(platform)/_components/MovieCard";
 import useInfiniteScrollMovies from "../hooks/useInfiniteScrollMovies";
 import useIntersectionObserver from "../hooks/useIntersectionObserver";
-import { ClipLoader } from "react-spinners";
+import LoadingSpinner from "../../components/ui/LoadingSpinner";
 
 const TrendingPage: React.FC = () => {
   console.log("TrendingPage component rendering");
@@ -26,34 +26,9 @@ const TrendingPage: React.FC = () => {
     timeWindow,
   });
 
-  console.log("useInfiniteScrollMovies returned:", {
-    moviesCount: movies.length,
-    isLoading,
-    isLoadingMore,
-    hasMore,
-    error,
-  });
-
-  console.log("About to create intersection observer with:", {
-    hasMore,
-    isLoadingMore,
-    enabled: hasMore && !isLoadingMore,
-  });
-
   const loadMoreRef = useIntersectionObserver({
     onIntersect: loadMore,
     enabled: hasMore && !isLoadingMore,
-  });
-
-  console.log("loadMoreRef created:", loadMoreRef);
-
-  console.log("TrendingPage final state:", {
-    moviesCount: movies.length,
-    isLoading,
-    isLoadingMore,
-    hasMore,
-    timeWindow,
-    observerEnabled: hasMore && !isLoadingMore,
   });
 
   const handleTimeWindowChange = (newTimeWindow: "day" | "week") => {
@@ -96,8 +71,8 @@ const TrendingPage: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex min-h-screen justify-center items-center py-20">
-            <ClipLoader size={60} color={"#E50913"} loading={true} />
+          <div className="min-h-screen">
+            <LoadingSpinner />
           </div>
         )}
 
@@ -130,11 +105,10 @@ const TrendingPage: React.FC = () => {
               <div
                 ref={loadMoreRef}
                 className="flex justify-center py-8 min-h-[100px] bg-gray-800/20"
-                style={{ border: "1px solid red" }} // Debug visual
               >
                 {isLoadingMore ? (
                   <div className="flex items-center gap-3">
-                    <ClipLoader size={24} color={"#E50913"} loading={true} />
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-red-600"></div>
                     <span className="text-gray-300">
                       Loading more movies...
                     </span>

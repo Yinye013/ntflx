@@ -5,6 +5,7 @@ import MainLayout from "../../mainlayout";
 import usePersonDetails from "../../hooks/usePersonDetails";
 import usePersonMovies from "../../hooks/usePersonMovies";
 import { useParams } from "next/navigation";
+import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 
 const PersonDetailsPage: React.FC = () => {
   const { id } = useParams();
@@ -68,8 +69,8 @@ const PersonDetailsPage: React.FC = () => {
       <div className="pt-[130px] px-4 md:px-8 lg:px-16 bg-gradient-to-b from-black via-gray-900 to-black min-h-screen">
         {/* Loading State */}
         {isLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="text-white text-lg">Loading person details...</div>
+          <div className="min-h-screen">
+            <LoadingSpinner />
           </div>
         )}
 
@@ -111,7 +112,7 @@ const PersonDetailsPage: React.FC = () => {
                     {data.name}
                   </h1>
                   <p className="text-gray-300 text-lg">
-                    {data.known_for_department}
+                    Known for: {data.known_for_department}
                   </p>
                 </div>
 

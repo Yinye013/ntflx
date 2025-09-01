@@ -1,6 +1,5 @@
 import Link from "next/link";
 import React, { useState } from "react";
-import { ClipLoader } from "react-spinners";
 import { FaArrowLeft } from "react-icons/fa";
 
 const BackButton = () => {
@@ -16,7 +15,7 @@ const BackButton = () => {
       className="bg-white lg:w-[12%] flex items-center justify-center gap-3 rounded-md mb-10  lg:px-6 lg:py-3"
     >
       {linkLoading ? (
-        <ClipLoader size={20} color="#000" />
+        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
       ) : (
         <>
           <FaArrowLeft />

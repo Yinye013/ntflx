@@ -9,7 +9,6 @@ import { signIn } from "next-auth/react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Button } from "../../../../components/ui/button";
-import { ClipLoader } from "react-spinners";
 
 function AuthPageContent() {
   const [email, setEmail] = useState("");
@@ -199,7 +198,7 @@ function AuthPageContent() {
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <ClipLoader color="#fff" size={20} />
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                 ) : toggler === "login" ? (
                   "Login"
                 ) : (
@@ -223,7 +222,7 @@ function AuthPageContent() {
               "
               >
                 {isGoogleLoading ? (
-                  <ClipLoader color="#000" size={20} />
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
                 ) : (
                   <FcGoogle size={30} />
                 )}
@@ -241,7 +240,7 @@ function AuthPageContent() {
               "
               >
                 {isGithubLoading ? (
-                  <ClipLoader color="#000" size={20} />
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
                 ) : (
                   <FaGithub size={30} />
                 )}

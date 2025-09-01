@@ -3,7 +3,7 @@ import React, { useState } from "react";
 // import BackButton from "./BackButton";
 import Rating from "./Rating";
 import { format, parse } from "date-fns";
-import { ClipLoader } from "react-spinners";
+import LoadingSpinner from "@/components/ui/LoadingSpinner";
 import {
   FaClock,
   FaCalendarAlt,
@@ -71,8 +71,8 @@ const MovieDetails: React.FC<MovieDetailsProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-20">
-        <ClipLoader size={60} color={"#E50913"} loading={true} />
+      <div className="py-20">
+        <LoadingSpinner />
       </div>
     );
   }
