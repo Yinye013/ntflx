@@ -9,12 +9,12 @@ type RatingProps = {
   className?: string;
 };
 
-const Rating: React.FC<RatingProps> = ({ 
-  voteAverage, 
-  maxStars = 5, 
+const Rating: React.FC<RatingProps> = ({
+  voteAverage,
+  maxStars = 5,
   size = "md",
   showValue = false,
-  className = ""
+  className = "",
 }) => {
   // Convert 0-10 rating to 0-maxStars scale
   const normalizedRating = (voteAverage / 10) * maxStars;
@@ -22,18 +22,18 @@ const Rating: React.FC<RatingProps> = ({
 
   const sizeClasses = {
     sm: "text-sm",
-    md: "text-base", 
-    lg: "text-lg"
+    md: "text-base",
+    lg: "text-lg",
   };
 
   const stars: JSX.Element[] = [];
-  
+
   for (let i = 1; i <= maxStars; i++) {
     if (i <= roundedRating) {
       // Full star
       stars.push(
-        <FaStar 
-          key={i} 
+        <FaStar
+          key={i}
           className={`text-yellow-400 ${sizeClasses[size]}`}
           aria-hidden="true"
         />
@@ -41,8 +41,8 @@ const Rating: React.FC<RatingProps> = ({
     } else if (i - roundedRating === 0.5) {
       // Half star
       stars.push(
-        <FaStarHalfAlt 
-          key={i} 
+        <FaStarHalfAlt
+          key={i}
           className={`text-yellow-400 ${sizeClasses[size]}`}
           aria-hidden="true"
         />
@@ -50,8 +50,8 @@ const Rating: React.FC<RatingProps> = ({
     } else {
       // Empty star
       stars.push(
-        <FaStar 
-          key={i} 
+        <FaStar
+          key={i}
           className={`text-gray-400 ${sizeClasses[size]}`}
           aria-hidden="true"
         />
@@ -60,14 +60,12 @@ const Rating: React.FC<RatingProps> = ({
   }
 
   return (
-    <div 
+    <div
       className={`flex items-center gap-1 ${className}`}
       role="img"
       aria-label={`Rating: ${voteAverage} out of 10 stars`}
     >
-      <div className="flex">
-        {stars}
-      </div>
+      <div className="flex">{stars}</div>
       {showValue && (
         <span className={`text-gray-600 ml-1 ${sizeClasses[size]}`}>
           ({voteAverage.toFixed(1)})
